@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt2Print - AI-Powered Custom Image Generation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --gray: #64748b;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--dark);
+            color: var(--light);
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 8rem 5% 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 30%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 70%, rgba(236, 72, 153, 0.15) 0%, transparent 50%);
+            animation: rotate 30s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(99, 102, 241, 0.5);
+            border-radius: 50px;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            color: var(--primary);
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 .word {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary), var(--secondary), #f97316);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 200% 200%;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--gray);
+            margin-bottom: 3rem;
+            opacity: 0;
+        }
+
+        .generate-btn {
+            position: relative;
+            padding: 1.2rem 3rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            opacity: 0;
+        }
+
+        .generate-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .generate-btn:hover::before {
+            left: 100%;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-sparkle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0;
+        }
+
+        /* Floating Elements */
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.5;
+        }
+
+        .shape-1 {
+            width: 80px;
+            height: 80px;
+            background: var(--primary);
+            top: 20%;
+            left: 10%;
+            filter: blur(40px);
+        }
+
+        .shape-2 {
+            width: 120px;
+            height: 120px;
+            background: var(--secondary);
+            top: 60%;
+            right: 10%;
+            filter: blur(60px);
+        }
+
+        .shape-3 {
+            width: 60px;
+            height: 60px;
+            background: #f97316;
+            bottom: 20%;
+            left: 20%;
+            filter: blur(30px);
+        }
+
+        /* Products Section */
+        .products {
+            padding: 8rem 5%;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .product-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: transform 0.4s, box-shadow 0.4s;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .product-card:hover .product-image {
+            transform: scale(1.1);
+        }
+
+        .product-image-wrapper {
+            overflow: hidden;
+        }
+
+        .product-info {
+            padding: 1.5rem;
+        }
+
+        .product-info h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-info p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .product-tag {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        /* About Section */
+        .about {
+            padding: 8rem 5%;
+            background: linear-gradient(180deg, transparent, rgba(99, 102, 241, 0.05), transparent);
+        }
+
+        .about-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .about-visual {
+            position: relative;
+        }
+
+        .about-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 30px;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .about-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, var(--primary), transparent, var(--secondary), transparent);
+            animation: spin 10s linear infinite;
+            opacity: 0.1;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .about-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .about-content h2 {
+            font-size: clamp(2rem, 4vw, 2.5rem);
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .about-content p {
+            color: var(--gray);
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+
+        .features-list {
+            margin-top: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .feature-tag {
+            padding: 0.5rem 1rem;
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 30px;
+            font-size: 0.9rem;
+            color: var(--light);
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: 8rem 5%;
+        }
+
+        .contact-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 30px;
+            padding: 4rem;
+        }
+
+        .contact-form {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 1.2rem 1.5rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            color: var(--light);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: var(--gray);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .submit-btn {
+            padding: 1.2rem 3rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            width: fit-content;
+            margin: 0 auto;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Footer */
+        footer {
+            padding: 3rem 5%;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-logo {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .footer-tagline {
+            color: var(--gray);
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        .footer-divider {
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            margin: 2rem auto;
+        }
+
+        .footer-credits {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .footer-credits span {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .about-container {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-container {
+                padding: 2rem;
+            }
+        }
+
+        /* Scroll Progress */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            z-index: 9999;
+            width: 0%;
+        }
+
+        /* Cursor Effect */
+        .cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s;
+            mix-blend-mode: difference;
+        }
+
+        .cursor-follower {
+            width: 40px;
+            height: 40px;
+            background: rgba(99, 102, 241, 0.2);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transition: transform 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="scroll-progress" id="scrollProgress"></div>
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-follower" id="cursorFollower"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">Prompt2Print</div>
+        <ul class="nav-links">
+            <li><a href="#hero">Home</a></li>
+            <li><a href="#products">Products</a></li>
+            <li><a href="#about">About Us</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="floating-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+        </div>
+        <div class="hero-content">
+            <span class="hero-badge">✨ AI-Powered Platform</span>
+            <h1>
+                <span class="word">AI-Powered</span>
+                <span class="word gradient-text">Custom Image</span>
+                <span class="word">Generation</span>
+                <span class="word">and</span>
+                <span class="word gradient-text">Printing</span>
+                <span class="word">Platform</span>
+            </h1>
+            <p>Transform your ideas into stunning visuals and print them on merchandise with the power of AI. Create unique designs in seconds.</p>
+            <button class="generate-btn">
+                <span>✨ Generate Image</span>
+                <span class="btn-sparkle"></span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="products" id="products">
+        <div class="section-header">
+            <h2>Our <span class="gradient-text">Products</span></h2>
+            <p>Discover our range of customizable products ready for your unique AI-generated designs</p>
+        </div>
+        <div class="products-grid">
+            <div class="product-card">
+                <div class="product-image-wrapper">
+                    <img src="public/images/shirt.webp" alt="Classic White T-Shirt" class="product-image">
+                </div>
+                <div class="product-info">
+                    <h3>Classic White T-Shirt</h3>
+                    <p>Premium cotton canvas for your AI masterpiece</p>
+                    <span class="product-tag">Best Seller</span>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-image-wrapper">
+                    <img src="public/images/shirt-201.jpg" alt="Long Sleeve Shirt" class="product-image">
+                </div>
+                <div class="product-info">
+                    <h3>Long Sleeve Comfort</h3>
+                    <p>Soft blue fabric perfect for detailed prints</p>
+                    <span class="product-tag">New Arrival</span>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-image-wrapper">
+                    <img src="public/images/mug.jpg" alt="Ceramic Mug" class="product-image">
+                </div>
+                <div class="product-info">
+                    <h3>Premium Ceramic Mug</h3>
+                    <p>Start your morning with AI-designed art</p>
+                    <span class="product-tag">Popular</span>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-image-wrapper">
+                    <img src="public/images/notebook.webp" alt="Designer Notebook" class="product-image">
+                </div>
+                <div class="product-info">
+                    <h3>Designer Notebook</h3>
+                    <p>Capture ideas in style with custom covers</p>
+                    <span class="product-tag">Creative</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="about-container">
+            <div class="about-visual">
+                <div class="about-card">
+                    <div class="about-icon">🎨</div>
+                    <h3>Powered by AI</h3>
+                    <p style="color: var(--gray); margin-top: 1rem;">Using cutting-edge Stable Diffusion & DALL·E models to bring your imagination to life</p>
+                </div>
+            </div>
+            <div class="about-content">
+                <h2>About <span class="gradient-text">Prompt2Print</span></h2>
+                <p>
+                    With the rising demand for personalized products, AI-powered design tools are transforming creative industries. Our project, Prompt2Print, aims to provide a custom image generation and product design platform that enables users to create unique visuals using AI models (Stable Diffusion / DALL·E). These designs can then be directly applied to merchandise (e.g., T-shirts, mugs, posters) for on-demand printing.
+                </p>
+                <div class="features-list">
+                    <span class="feature-tag">🤖 Stable Diffusion</span>
+                    <span class="feature-tag">🎨 DALL·E</span>
+                    <span class="feature-tag">👕 Custom Merch</span>
+                    <span class="feature-tag">⚡ On-Demand Print</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <div class="section-header">
+            <h2>Get In <span class="gradient-text">Touch</span></h2>
+            <p>Have questions or want to collaborate? We'd love to hear from you!</p>
+        </div>
+        <div class="contact-container">
+            <form class="contact-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <input type="text" placeholder="Your Name" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" placeholder="Your Email" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <input type="text" placeholder="Subject">
+                </div>
+                <div class="form-group">
+                    <textarea placeholder="Your Message"></textarea>
+                </div>
+                <button type="submit" class="submit-btn">Send Message ✨</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">Prompt2Print</div>
+            <p class="footer-tagline">"Where Imagination Meets Print — One Prompt at a Time"</p>
+            <div class="footer-divider"></div>
+            <p class="footer-credits">
+                © 2025 Prompt2Print. All Rights Reserved.<br>
+                Developed with 💜 by <span>UBIT Team</span>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Register ScrollTrigger
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Hero Animations
+        gsap.to('.hero-badge', {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            delay: 0.3
+        });
+
+        // Word by word animation
+        gsap.to('.word', {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            stagger: 0.15,
+            delay: 0.5,
+            ease: 'power3.out'
+        });
+
+        gsap.to('.hero p', {
+            opacity: 1,
+            duration: 0.8,
+            delay: 1.5
+        });
+
+        gsap.to('.generate-btn', {
+            opacity: 1,
+            duration: 0.8,
+            delay: 1.8
+        });
+
+        // Floating shapes animation
+        gsap.to('.shape-1', {
+            y: -30,
+            x: 20,
+            duration: 4,
+            repeat: -1,
+            yoyo: true,
+            ease: 'power1.inOut'
+        });
+
+        gsap.to('.shape-2', {
+            y: 40,
+            x: -30,
+            duration: 5,
+            repeat: -1,
+            yoyo: true,
+            ease: 'power1.inOut'
+        });
+
+        gsap.to('.shape-3', {
+            y: -25,
+            x: 15,
+            duration: 3.5,
+            repeat: -1,
+            yoyo: true,
+            ease: 'power1.inOut'
+        });
+
+        // Product cards animation
+        gsap.utils.toArray('.product-card').forEach((card, i) => {
+            gsap.to(card, {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                delay: i * 0.2,
+                scrollTrigger: {
+                    trigger: card,
+                    start: 'top 85%'
+                }
+            });
+        });
+
+        // About section animation
+        gsap.from('.about-card', {
+            x: -100,
+            opacity: 0,
+            duration: 1,
+            scrollTrigger: {
+                trigger: '.about',
+                start: 'top 70%'
+            }
+        });
+
+        gsap.from('.about-content', {
+            x: 100,
+            opacity: 0,
+            duration: 1,
+            scrollTrigger: {
+                trigger: '.about',
+                start: 'top 70%'
+            }
+        });
+
+        // Contact form animation
+        gsap.from('.contact-container', {
+            y: 50,
+            opacity: 0,
+            duration: 1,
+            scrollTrigger: {
+                trigger: '.contact',
+                start: 'top 70%'
+            }
+        });
+
+        // Scroll Progress
+        window.addEventListener('scroll', () => {
+            const scrolled = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+            document.getElementById('scrollProgress').style.width = scrolled + '%';
+        });
+
+        // Custom Cursor
+        const cursor = document.getElementById('cursor');
+        const cursorFollower = document.getElementById('cursorFollower');
+
+        document.addEventListener('mousemove', (e) => {
+            gsap.to(cursor, {
+                x: e.clientX - 10,
+                y: e.clientY - 10,
+                duration: 0.1
+            });
+            gsap.to(cursorFollower, {
+                x: e.clientX - 20,
+                y: e.clientY - 20,
+                duration: 0.3
+            });
+        });
+
+        // Button hover effect
+        document.querySelector('.generate-btn').addEventListener('mouseenter', () => {
+            gsap.to(cursor, { scale: 2, duration: 0.3 });
+            gsap.to(cursorFollower, { scale: 1.5, duration: 0.3 });
+        });
+
+        document.querySelector('.generate-btn').addEventListener('mouseleave', () => {
+            gsap.to(cursor, { scale: 1, duration: 0.3 });
+            gsap.to(cursorFollower, { scale: 1, duration: 0.3 });
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                gsap.to(window, {
+                    duration: 1,
+                    scrollTo: target,
+                    ease: 'power2.inOut'
+                });
+            });
+        });
+
+        // Button click effect
+        document.querySelector('.generate-btn').addEventListener('click', function() {
+            gsap.to(this, {
+                scale: 0.95,
+                duration: 0.1,
+                yoyo: true,
+                repeat: 1
+            });
+        });
+    </script>
+</body>
+</html>
