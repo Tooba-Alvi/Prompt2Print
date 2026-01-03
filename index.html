@@ -8,22 +8,80 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <link rel="stylesheet" href="styles.css">
+    
 </head>
+<div class="mobile-bottom-nav">
+  <a href="index.html">🏠<span>Home</span></a>
+  <a href="#products">🛍️<span>Shop</span></a>
+  <a href="saved-designs.html">💾<span>Saved</span></a>
+  <a href="cart.html">🛒<span>Cart</span></a>
+</div>
+
 <body>
+
     <div class="scroll-progress" id="scrollProgress"></div>
     <div class="cursor" id="cursor"></div>
     <div class="cursor-follower" id="cursorFollower"></div>
 
-    <!-- Navigation -->
+    <!-- Navigation for desktop and mobile -->
     <nav>
-        <div class="logo">Prompt2Print</div>
+        <!-- <div class="logo" onclick="window.location.href='index.html'">Prompt2Print</div>
+        <!-- Updated navigation with all pages and cart icon -->
         <ul class="nav-links">
             <li><a href="#hero">Home</a></li>
             <li><a href="#products">Products</a></li>
+            <li><a href="saved-designs.html">Saved Designs</a></li>
             <li><a href="#about">About Us</a></li>
-            <li><a href="#contact">Contact</a></li>
-        </ul>
+            <li>
+                <a href="cart.html" class="cart-icon">
+                    🛒 Cart
+                    <span class="cart-count" id="cartCount">0</span>
+                </a>
+            </li>
+        </ul> --> <!--this is new code for mobile responsiveness-->
+        <nav>
+  <div class="logo" onclick="window.location.href='index.html'">Prompt2Print</div>
+
+  <!-- Desktop Nav -->
+  <ul class="nav-links">
+    <li><a href="#hero">Home</a></li>
+    <li><a href="#products">Products</a></li>
+    <li><a href="saved-designs.html">Saved Designs</a></li>
+    <li><a href="#about">About Us</a></li>
+    <li>
+      <a href="cart.html" class="cart-icon">
+        🛒 Cart <span class="cart-count" id="cartCount">0</span>
+      </a>
+    </li>
+  </ul>
+
+  <!-- Hamburger -->
+  <div class="hamburger" id="hamburger">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</nav>
+
+<!--Add Mobile Slide Menu (just after <nav>)-->
+    <div class="mobile-menu" id="mobileMenu">
+  <a href="#hero">Home</a>
+  <a href="#products">Products</a>
+  <a href="saved-designs.html">Saved Designs</a>
+  <a href="#about">About Us</a>
+  <a href="cart.html">🛒 Cart</a>
+</div>
+
+       
     </nav>
+<!-- Mobile Bottom Navigation -->
+    <div class="mobile-bottom-nav">
+  <a href="index.html">🏠<span>Home</span></a>
+  <a href="#products">🛍️<span>Products</span></a>
+  <a href="saved-designs.html">💾<span>Saved</span></a>
+  <a href="cart.html">🛒<span>Cart</span></a>
+</div>
+
 
     <!-- Hero Section -->
     <section class="hero" id="hero">
@@ -62,7 +120,7 @@
                     <p>Premium cotton canvas for your AI masterpiece</p>
                     <div class="product-bottom">
                         <span class="product-tag">Best Seller</span>
-                        <button class="product-generate-btn" data-product="Classic White T-Shirt">🎨 Generate</button>
+                        <button class="product-generate-btn" data-product="Classic White T-Shirt" data-price="29.99">🎨 Generate</button>
                     </div>
                 </div>
             </div>
@@ -75,7 +133,7 @@
                     <p>Soft blue fabric perfect for detailed prints</p>
                     <div class="product-bottom">
                         <span class="product-tag">New Arrival</span>
-                        <button class="product-generate-btn" data-product="Long Sleeve Comfort">🎨 Generate</button>
+                        <button class="product-generate-btn" data-product="Long Sleeve Comfort" data-price="34.99">🎨 Generate</button>
                     </div>
                 </div>
             </div>
@@ -88,7 +146,7 @@
                     <p>Start your morning with AI-designed art</p>
                     <div class="product-bottom">
                         <span class="product-tag">Popular</span>
-                        <button class="product-generate-btn" data-product="Premium Ceramic Mug">🎨 Generate</button>
+                        <button class="product-generate-btn" data-product="Premium Ceramic Mug" data-price="19.99">🎨 Generate</button>
                     </div>
                 </div>
             </div>
@@ -101,13 +159,14 @@
                     <p>Capture ideas in style with custom covers</p>
                     <div class="product-bottom">
                         <span class="product-tag">Creative</span>
-                        <button class="product-generate-btn" data-product="Designer Notebook">🎨 Generate</button>
+                        <button class="product-generate-btn" data-product="Designer Notebook" data-price="24.99">🎨 Generate</button>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- Generation Modal -->
     <div class="modal" id="generationModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -156,7 +215,8 @@
         </div>
     </section>
 
-    <!-- Contact Section -->
+    <!-- Contact section completely commented out (hidden from view) -->
+    <!-- CONTACT SECTION - COMMENTED OUT
     <section class="contact" id="contact">
         <div class="section-header">
             <h2>Get In <span class="gradient-text">Touch</span></h2>
@@ -182,6 +242,7 @@
             </form>
         </div>
     </section>
+    -->
 
     <!-- Footer -->
     <footer>
@@ -196,237 +257,6 @@
         </div>
     </footer>
 
-    <script>
-        // Register ScrollTrigger
-        gsap.registerPlugin(ScrollTrigger);
-
-        // Hero Animations
-        gsap.to('.hero-badge', {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            delay: 0.3
-        });
-
-        // Word by word animation
-        gsap.to('.word', {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            stagger: 0.15,
-            delay: 0.5,
-            ease: 'power3.out'
-        });
-
-        gsap.to('.hero p', {
-            opacity: 1,
-            duration: 0.8,
-            delay: 1.5
-        });
-
-        // Floating shapes animation
-        gsap.to('.shape-1', {
-            y: -30,
-            x: 20,
-            duration: 4,
-            repeat: -1,
-            yoyo: true,
-            ease: 'power1.inOut'
-        });
-
-        gsap.to('.shape-2', {
-            y: 40,
-            x: -30,
-            duration: 5,
-            repeat: -1,
-            yoyo: true,
-            ease: 'power1.inOut'
-        });
-
-        gsap.to('.shape-3', {
-            y: -25,
-            x: 15,
-            duration: 3.5,
-            repeat: -1,
-            yoyo: true,
-            ease: 'power1.inOut'
-        });
-
-        // Product cards animation
-        gsap.utils.toArray('.product-card').forEach((card, i) => {
-            gsap.to(card, {
-                opacity: 1,
-                y: 0,
-                duration: 0.8,
-                delay: i * 0.2,
-                scrollTrigger: {
-                    trigger: card,
-                    start: 'top 85%'
-                }
-            });
-        });
-
-        // About section animation
-        gsap.from('.about-card', {
-            x: -100,
-            opacity: 0,
-            duration: 1,
-            scrollTrigger: {
-                trigger: '.about',
-                start: 'top 70%'
-            }
-        });
-
-        gsap.from('.about-content', {
-            x: 100,
-            opacity: 0,
-            duration: 1,
-            scrollTrigger: {
-                trigger: '.about',
-                start: 'top 70%'
-            }
-        });
-
-        // Contact form animation
-        gsap.from('.contact-container', {
-            y: 50,
-            opacity: 0,
-            duration: 1,
-            scrollTrigger: {
-                trigger: '.contact',
-                start: 'top 70%'
-            }
-        });
-
-        // Scroll Progress
-        window.addEventListener('scroll', () => {
-            const scrolled = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
-            document.getElementById('scrollProgress').style.width = scrolled + '%';
-        });
-
-        // Custom Cursor
-        const cursor = document.getElementById('cursor');
-        const cursorFollower = document.getElementById('cursorFollower');
-
-        document.addEventListener('mousemove', (e) => {
-            gsap.to(cursor, {
-                x: e.clientX - 10,
-                y: e.clientY - 10,
-                duration: 0.1
-            });
-            gsap.to(cursorFollower, {
-                x: e.clientX - 20,
-                y: e.clientY - 20,
-                duration: 0.3
-            });
-        });
-
-        // Button hover effects
-        document.querySelectorAll('.product-generate-btn').forEach(btn => {
-            btn.addEventListener('mouseenter', () => {
-                gsap.to(cursor, { scale: 2, duration: 0.3 });
-                gsap.to(cursorFollower, { scale: 1.5, duration: 0.3 });
-            });
-
-            btn.addEventListener('mouseleave', () => {
-                gsap.to(cursor, { scale: 1, duration: 0.3 });
-                gsap.to(cursorFollower, { scale: 1, duration: 0.3 });
-            });
-        });
-
-        // Smooth scroll
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                gsap.to(window, {
-                    duration: 1,
-                    scrollTo: target,
-                    ease: 'power2.inOut'
-                });
-            });
-        });
-
-        const modal = document.getElementById('generationModal');
-        const closeModal = document.getElementById('closeModal');
-        const generationForm = document.getElementById('generationForm');
-        const promptInput = document.getElementById('promptInput');
-        const generateBtn = document.getElementById('generateBtn');
-        const productName = document.getElementById('productName');
-        const generationResult = document.getElementById('generationResult');
-
-        let currentProduct = '';
-
-        // Open modal when generate button is clicked
-        document.querySelectorAll('.product-generate-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                currentProduct = btn.getAttribute('data-product');
-                productName.textContent = currentProduct;
-                promptInput.value = '';
-                generationResult.innerHTML = '';
-                modal.classList.add('active');
-                promptInput.focus();
-            });
-        });
-
-        // Close modal
-        closeModal.addEventListener('click', () => {
-            modal.classList.remove('active');
-        });
-
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.classList.remove('active');
-            }
-        });
-
-        // Generate image on form submit
-        generationForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const prompt = promptInput.value.trim();
-            if (!prompt) return;
-
-            generateBtn.disabled = true;
-            generateBtn.textContent = 'Generating...';
-            generationResult.innerHTML = '<div class="loading-spinner"></div><p style="color: var(--gray); margin-top: 1rem;">Creating your masterpiece...</p>';
-
-            try {
-                // Call the API to generate image
-                const response = await fetch('/api/generate-image', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        prompt: `${prompt} for a ${currentProduct}`,
-                        product: currentProduct
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to generate image');
-                }
-
-                const data = await response.json();
-                
-                generationResult.innerHTML = `
-                    <div class="generated-image-container">
-                        <img src="${data.imageUrl}" alt="Generated image" class="generated-image">
-                        <p style="color: var(--gray); font-size: 0.9rem;">✨ Your AI-generated design is ready!</p>
-                    </div>
-                `;
-
-            } catch (error) {
-                console.error('Error:', error);
-                generationResult.innerHTML = `
-                    <p style="color: #ef4444; margin-top: 1rem;">Failed to generate image. Please try again with a different prompt.</p>
-                `;
-            } finally {
-                generateBtn.disabled = false;
-                generateBtn.textContent = 'Generate Image ✨';
-            }
-        });
-    </script>
+    <script src="Gsap.js"></script>
 </body>
 </html>
